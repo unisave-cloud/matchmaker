@@ -4,12 +4,14 @@ using Unisave.Matchmaker.Backend;
 
 namespace Unisave.Matchmaker.Examples.Basics.Backend
 {
-    public class ExampleRoom : Room
+    public class ExampleRoom : Room<ExamplePlayerMember>
     {
         public int capacity;
         public string level; // desert, mountains, etc.
+    }
 
-        Dictionary<string, string> playerNames
-            = new Dictionary<string, string>();
+    public class ExamplePlayerMember : PlayerMember
+    {
+        public string name;
     }
 }

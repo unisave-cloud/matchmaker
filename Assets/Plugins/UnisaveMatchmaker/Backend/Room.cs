@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unisave.Facades;
 using Unisave.Serialization;
 using Unisave;
@@ -6,23 +8,44 @@ using LightJson;
 
 namespace Unisave.Matchmaker.Backend
 {
+    public class Room<TPlayer> : Room where TPlayer : PlayerMember
+    {
+        [field: SerializeAs("players")]
+        public List<TPlayer> Players { get; set; } = new List<TPlayer>();
+
+        public override int PlayerCount => Players?.Count ?? 0;
+        
+        #region "User-definabale callbacks"
+
+        protected virtual void OnPlayerJoining(TPlayer player) { }
+        
+        protected virtual bool CanClientCreateRoom(out string rejectionReason)
+        {
+            rejectionReason = "CLIENT_ROOM_CREATION_DISABLED";
+            return false;
+        }
+        
+        #endregion
+    }
+    
     /// <summary>
     /// Represents a multiplayer room
     /// </summary>
-    public class Room
+    public abstract class Room
     {
         public const string RoomsCollectionName = "matchmakerRooms";
 
-        [SerializeAs("_key")]
-        public string id;
+        [field: SerializeAs("_key")]
+        public string Id { get; set; }
 
-        public bool isVisibleInLobby;
-
-        // TODO: remember all players here
+        [field: SerializeAs("isVisibleInLobby")]
+        public bool IsVisibleInLobby { get; set; }
+        
+        public abstract int PlayerCount { get; }
 
         public Room()
         {
-            this.id = Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
         }
 
         public static T Create<T>(Action<T> builder) where T : Room, new()
@@ -57,5 +80,16 @@ namespace Unisave.Matchmaker.Backend
                 .Bind("document", document)
                 .Run();
         }
+        
+        #region "User-definabale callbacks"
+
+        public void CallOnPlayerJoining(string playerId)
+        {
+            // TODO
+            
+            //
+        }
+        
+        #endregion
     }
 }
