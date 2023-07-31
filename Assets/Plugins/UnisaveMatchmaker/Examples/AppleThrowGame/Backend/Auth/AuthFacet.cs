@@ -5,7 +5,7 @@ using Unisave;
 using Unisave.Facets;
 using Unisave.Facades;
 
-namespace Unisave.Matchmaker.Examples.Basics.Backend
+namespace Unisave.Matchmaker.Examples.AppleThrowGame.Backend
 {
     /// <summary>
     /// Dummy login method

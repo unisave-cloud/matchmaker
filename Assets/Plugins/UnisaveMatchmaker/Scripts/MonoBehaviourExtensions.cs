@@ -30,5 +30,14 @@ namespace Unisave.Matchmaker
                 (MatchmakerFacet f) => f.ClientCreatesRoom(room)
             );
         }
+
+        public static void WatchRoom<T>(
+            this MonoBehaviour caller,
+            T roomToWatch,
+            Action<T> callback
+        )
+        {
+            // TODO
+        }
     }
 }

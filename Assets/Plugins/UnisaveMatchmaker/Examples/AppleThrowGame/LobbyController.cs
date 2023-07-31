@@ -7,7 +7,7 @@ using Unisave;
 using Unisave.Facets;
 using Unisave.Matchmaker.Examples.Basics.Backend;
 
-namespace Unisave.Matchmaker.Examples.Basics
+namespace Unisave.Matchmaker.Examples.AppleThrowGame
 {
     public class LobbyController : MonoBehaviour
     {
