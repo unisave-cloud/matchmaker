@@ -11,6 +11,12 @@ Unisave Matchmaker
 This repository contains the Unisave Matchmaker asset sources.
 
 
+Documentation
+-------------
+
+Documentation is being created in the [`docs.md`](docs.md) file.
+
+
 Setting up development
 ----------------------
 
