@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Unisave.Matchmaker.Backend;
 using Unisave.Facets;
+using Object = System.Object;
 
 namespace Unisave.Matchmaker
 {
@@ -10,15 +11,15 @@ namespace Unisave.Matchmaker
     /// </summary>
     public static class MonoBehaviourExtensions
     {
-        public static UnisaveOperation CreateRoom<T>(
+        public static UnisaveOperation<CreateRoomResult<TRoom>> CreateRoom<TRoom>(
             this MonoBehaviour caller,
-            Action<T> builder
-        ) where T : Room, new()
+            Action<TRoom> builder
+        ) where TRoom : Room, new()
         {
             // NOTE:
             // This method is the client-side equivalent of Room.Create<T>()
 
-            T room = new T();
+            TRoom room = new TRoom();
 
             // TODO: fire event
 
@@ -26,18 +27,37 @@ namespace Unisave.Matchmaker
 
             // TODO: fire event
 
-            return caller.CallFacet(
-                (MatchmakerFacet f) => f.ClientCreatesRoom(room)
+            return new UnisaveOperation<CreateRoomResult<TRoom>>(
+                caller,
+                async () => {
+                    CreateRoomResult result = await caller.CallFacet(
+                        (MatchmakerFacet f) => f.ClientCreatesRoom(room)
+                    );
+                    return (CreateRoomResult<TRoom>) result;
+                }
             );
         }
 
-        public static void WatchRoom<T>(
+        public static UnisaveOperation<RoomWatcher<TRoom>> WatchRoom<TRoom>(
             this MonoBehaviour caller,
-            T roomToWatch,
-            Action<T> callback
-        )
+            TRoom roomToWatch,
+            Action<RoomWatcher<TRoom>> builder
+        ) where TRoom : Room
         {
-            // TODO
+            bool exists = caller.TryGetComponent<RoomWatcher<TRoom>>(
+                out var watcher
+            );
+            
+            if (!exists)
+                watcher = caller.gameObject.AddComponent<RoomWatcher<TRoom>>();
+            
+            watcher.Prepare(roomToWatch);
+            
+            builder.Invoke(watcher);
+            
+            return new UnisaveOperation<RoomWatcher<TRoom>>(
+                caller, watcher.Connect()
+            );
         }
     }
 }

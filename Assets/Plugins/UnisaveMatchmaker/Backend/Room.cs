@@ -48,12 +48,13 @@ namespace Unisave.Matchmaker.Backend
             Id = Guid.NewGuid().ToString();
         }
 
-        public static T Create<T>(Action<T> builder) where T : Room, new()
+        public static TRoom Create<TRoom>(Action<TRoom> builder)
+            where TRoom : Room, new()
         {
             // TODO: verify this is called from the server
             // and if not, tell the developer to use the MonoBehav extension method
 
-            T room = new T();
+            TRoom room = new TRoom();
 
             // TODO: fire event
 
@@ -64,6 +65,18 @@ namespace Unisave.Matchmaker.Backend
             room.Save();
 
             return room;
+        }
+
+        public static Room Find(string roomId)
+        {
+            // TODO: return null if collection missing
+            
+            return DB.Query(@"
+                RETURN DOCUMENT(@@collection, @key)
+            ")
+                .Bind("@collection", RoomsCollectionName)
+                .Bind("key", roomId)
+                .FirstAs<Room>();
         }
 
         public void Save()

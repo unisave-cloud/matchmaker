@@ -24,21 +24,5 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
         {
             currentRound += 1;
         }
-        
-        // public async void Connect(string roomId)
-        // {
-        //     ChannelSubscription subscription = await this.CallFacet(
-        //         (AppleThrowGameFacet f) => f.JoinBroadcastingChannel(roomId)
-        //     );
-        //
-        //     FromSubscription(subscription)
-        //         .Forward<AppleThrownMessage>(OnAvatarMoved)
-        //         .ElseLogWarning();
-        // }
-        //
-        // void OnAvatarMoved(AppleThrownMessage message)
-        // {
-        //     
-        // }
     }
 }

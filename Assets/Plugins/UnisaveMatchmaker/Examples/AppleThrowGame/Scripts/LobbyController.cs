@@ -9,46 +9,63 @@ using Unisave.Matchmaker.Examples.AppleThrowGame.Backend;
 
 namespace Unisave.Matchmaker.Examples.AppleThrowGame
 {
+    /// <summary>
+    /// Controls the user interface in the lobby screen
+    /// </summary>
     public class LobbyController : MonoBehaviour
     {
+        public GameObject lobbyScreen;
+        public GameObject roomScreen;
+        
+        private readonly List<CustomRoom> lobbyRooms = new List<CustomRoom>();
+        private AppleColor appleColor = AppleColor.Red;
+        
         void Start()
         {
-            // RenderRooms(null);
+            // TODO: watch lobby
         }
 
-        void RenderRooms(List<Room> rooms)
+        void RenderUI()
         {
-            Debug.Log("Rendering rooms:");
-            foreach (Room r in rooms)
-            {
-                CustomRoom room = (CustomRoom)r;
+            Debug.Log("Apple: " + appleColor);
             
-                string level = room.level;
+            Debug.Log("Rendering rooms:");
+            foreach (CustomRoom room in lobbyRooms)
+            {
+                string map = room.map;
                 int players = room.PlayerCount;
                 int capacity = room.capacity;
                 
-                Debug.Log($"    {level} {players}/{capacity}");
+                Debug.Log($"    {map} {players}/{capacity}");
             }
         }
 
+        /// <summary>
+        /// Handles the "Create Room" button click
+        /// </summary>
         public async void CreateCustomRoom()
         {
-            await this.CreateRoom<CustomRoom>(r => {
-                r.capacity = 16;
-                r.level = "desert";
+            var result = await this.CreateRoom<CustomRoom>(room => {
+                room.IsVisibleInLobby = true;
+                room.capacity = 16;
+                room.map = "desert";
             });
 
-            // TODO: get the room back (because we need the ID and so on...)
-            
-            Debug.Log("Room created!");
-            
-            // TODO: call "JoinRoom"
+            if (result.Success)
+            {
+                ConnectToRoom(result.Room);
+            }
+            else
+            {
+                Debug.LogError("Room creation failed: " + result.RejectionReason);
+            }
         }
 
         /// <summary>
-        /// Call this method to initiate the process of joining a room
+        /// Call this method after we join a room to initiate the process
+        /// of actually connecting to the room
         /// </summary>
-        public void JoinRoom(CustomRoom room)
+        private async void ConnectToRoom(CustomRoom room)
         {
             // Here you can connect to Photon, Mirror, Fish-Net server,
             // load scenes, do whatever it takes to establish a connection
@@ -58,9 +75,23 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
             // You can use room fields, such as room ID, server URL and other
             // values to establish the connection.
             
-            // In this example we enable the "RoomScene" component.
-            // This component contains the "MatchController" that uses
-            // Unisave broadcasting to implement a simple turn-based game.
+            // In this example we enable the "RoomScene" component which handles
+            // the in-room logic.
+            
+            // In our case, the connection logic also involves setting
+            // our apple color for the room we are connecting:
+            await this.CallFacet(
+                (GameFacet f) => f.SetMyRoomAppleColor(room.Id, appleColor)
+            );
+            
+            // We send the room to the room controller:
+            RoomController.joinedRoom = room;
+            
+            // Then we can switch to the room screen (like loading a scene):
+            lobbyScreen.SetActive(false);
+            roomScreen.SetActive(true);
+            
+            // The room controller then pings the server that we are "connected".
         }
     }
 }
