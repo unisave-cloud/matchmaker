@@ -5,7 +5,7 @@ using Unisave.Matchmaker.Backend;
 using UnityEngine;
 using Unisave;
 using Unisave.Facets;
-using Unisave.Matchmaker.Examples.Basics.Backend;
+using Unisave.Matchmaker.Examples.AppleThrowGame.Backend;
 
 namespace Unisave.Matchmaker.Examples.AppleThrowGame
 {
@@ -21,7 +21,7 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
             Debug.Log("Rendering rooms:");
             foreach (Room r in rooms)
             {
-                ExampleRoom room = (ExampleRoom)r;
+                CustomRoom room = (CustomRoom)r;
             
                 string level = room.level;
                 int players = room.PlayerCount;
@@ -33,7 +33,7 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
 
         public async void CreateCustomRoom()
         {
-            await this.CreateRoom<ExampleRoom>(r => {
+            await this.CreateRoom<CustomRoom>(r => {
                 r.capacity = 16;
                 r.level = "desert";
             });
@@ -48,7 +48,7 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
         /// <summary>
         /// Call this method to initiate the process of joining a room
         /// </summary>
-        public void JoinRoom(ExampleRoom room)
+        public void JoinRoom(CustomRoom room)
         {
             // Here you can connect to Photon, Mirror, Fish-Net server,
             // load scenes, do whatever it takes to establish a connection
