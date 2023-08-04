@@ -33,7 +33,7 @@ namespace Unisave.Matchmaker
                     CreateRoomResult result = await caller.CallFacet(
                         (MatchmakerFacet f) => f.ClientCreatesRoom(room)
                     );
-                    return (CreateRoomResult<TRoom>) result;
+                    return new CreateRoomResult<TRoom>(result);
                 }
             );
         }

@@ -8,13 +8,29 @@ namespace Unisave.Matchmaker.Backend
     /// </summary>
     public class CreateRoomResult<TRoom> : CreateRoomResult where TRoom : Room
     {
+        /*
+         * This class is only used on the client, because it cannot be
+         * serialized due to its generic type. That's why it's sent
+         * non-generic and then cloned on the client.
+         */
+        
         /// <summary>
         /// The room that was created (or was to be created)
         /// </summary>
-        public TRoom Room => (TRoom) room;
+        public TRoom Room => (TRoom) BaseRoom;
+
+        public CreateRoomResult(CreateRoomResult nonGeneric)
+        {
+            Success = nonGeneric.Success;
+            RejectionReason = nonGeneric.RejectionReason;
+            BaseRoom = nonGeneric.BaseRoom;
+            
+            if (!(BaseRoom is TRoom))
+                throw new ArgumentException("Given result is of wrong room type.");
+        }
     }
 
-    public abstract class CreateRoomResult
+    public class CreateRoomResult
     {
         /// <summary>
         /// True if the room was created
@@ -27,9 +43,10 @@ namespace Unisave.Matchmaker.Backend
         public string RejectionReason { get; set; }
 
         /// <summary>
-        /// References the room that was to be created
+        /// References the room that was (or was to be) created
+        /// as the general <see cref="Room"/> base type
         /// </summary>
-        protected Room room;
+        public Room BaseRoom { get; set; }
         
         public static CreateRoomResult FromSuccess(Room room)
         {
@@ -56,11 +73,11 @@ namespace Unisave.Matchmaker.Backend
         
         public static CreateRoomResult CreateForRoom(Room room)
         {
-            Type type = typeof(CreateRoomResult<>).MakeGenericType(
-                room.GetType()
-            );
-
-            return (CreateRoomResult) Activator.CreateInstance(type);
+            var result = new CreateRoomResult();
+            
+            result.BaseRoom = room;
+            
+            return result;
         }
     }
 }

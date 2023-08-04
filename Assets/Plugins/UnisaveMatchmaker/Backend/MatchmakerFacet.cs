@@ -17,6 +17,7 @@ namespace Unisave.Matchmaker.Backend
             room.Save();
             
             // TODO: join the room with that player
+            Room.Join(room.Id);
 
             return CreateRoomResult.FromSuccess(room);
         }

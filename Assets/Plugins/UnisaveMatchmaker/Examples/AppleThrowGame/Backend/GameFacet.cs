@@ -14,26 +14,20 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame.Backend
             if (!Auth.Check())
                 throw new InvalidOperationException("Nobody is logged in");
             
-            var room = Room.Find(roomId) as CustomRoom;
-            
-            if (room == null)
-                throw new InvalidOperationException(
-                    "Requested room does not exist or is of different type"
+            Room.Modify<CustomRoom>(roomId, room => {
+                
+                CustomRoomPlayerMember player = room.Players.Find(
+                    p => p.Id == Auth.Id()
                 );
-
-            CustomRoomPlayerMember player = room.Players.Find(
-                p => p.Id == Auth.Id()
-            );
-            
-            if (player == null)
-                throw new InvalidOperationException(
-                    "You have not joined this room"
-                );
-
-            // TODO: make this atomic! ?!?!?!?!?
-
-            player.appleColor = appleColor;
-            room.Save();
+                
+                if (player == null)
+                    throw new InvalidOperationException(
+                        "You are not joined to this room"
+                    );
+                
+                player.appleColor = appleColor;
+                
+            });
         }
         
         public ChannelSubscription JoinBroadcastingChannel(string roomId)

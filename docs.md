@@ -107,7 +107,19 @@ public class MyLobbyController : MonoBehaviour
 }
 ```
 
-TODO: join from the server
+To join a room from the server, you do:
+
+```cs
+public class MyFacet : Facet
+{
+    public JoinRoomResult JoinRoom(string roomId)
+    {
+        var result = Room.Join(roomId);
+        
+        return result;
+    }
+}
+```
 
 TODO: join with friends
 
@@ -168,6 +180,8 @@ TODO: connection from an authoritative real-time server
 
 
 ### Defining a room type
+
+When you need different room data. A championship room is going to track different values than a custom room, which is going to be different to a matchmaker room, etc.
 
 ```cs
 using Unisave.Matchmaker.Backend;
@@ -236,6 +250,37 @@ public class MyLobbyController : MonoBehaviour
 }
 ```
 
-TODO: creating rooms from the server
+To create a room from the server, you do:
+
+```cs
+public class MyFacet : Facet
+{
+    public RegularRoom CreateRegularRoom(string title)
+    {
+        return Room.Create<RegularRoom>(room => {
+            room.title = title;
+        });
+        
+        // the room has no players when created in this way
+    }
+}
+```
 
 TODO: testing whether a player can create a room
+
+
+### Modifying rooms
+
+Rooms can be modified only from the server and their modification is atomic. This is to properly serialize multiple modifications coming in at the same time and resolve write-write conflicts automatically.
+
+```cs
+public class MyFacet : Facet
+{
+    public void ChangeMap(string roomId, string map)
+    {
+        Room.Modify<RegularRoom>(roomId, room => {
+            room.map = map;
+        });
+    }
+}
+```

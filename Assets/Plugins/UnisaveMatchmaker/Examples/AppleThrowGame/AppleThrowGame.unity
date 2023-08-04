@@ -1374,6 +1374,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4569418d87ad4a26a54a761f921fc9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lobbyScreen: {fileID: 591903634}
+  roomScreen: {fileID: 1901214309}
 --- !u!114 &847634451 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4185302268226743245, guid: d9b963d9ac7e5e7408c8515c2bc63a82, type: 3}
