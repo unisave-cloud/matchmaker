@@ -44,14 +44,14 @@ namespace Unisave.Matchmaker
             Action<RoomWatcher<TRoom>> builder
         ) where TRoom : Room
         {
-            bool exists = caller.TryGetComponent<RoomWatcher<TRoom>>(
-                out var watcher
+            bool exists = caller.TryGetComponent<RoomWatcherComponent>(
+                out var watcherComponent
             );
             
             if (!exists)
-                watcher = caller.gameObject.AddComponent<RoomWatcher<TRoom>>();
-            
-            watcher.Prepare(roomToWatch);
+                watcherComponent = caller.gameObject.AddComponent<RoomWatcherComponent>();
+
+            var watcher = new RoomWatcher<TRoom>(watcherComponent, roomToWatch);
             
             builder.Invoke(watcher);
             

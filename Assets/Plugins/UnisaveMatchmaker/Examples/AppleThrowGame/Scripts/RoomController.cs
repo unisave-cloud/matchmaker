@@ -1,5 +1,7 @@
 using System;
+using Unisave.Facets;
 using Unisave.Matchmaker.Examples.AppleThrowGame.Backend;
+using Unisave.Serialization;
 using UnityEngine;
 
 namespace Unisave.Matchmaker.Examples.AppleThrowGame
@@ -21,7 +23,7 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
             joinedRoom = null;
             
             // start watching the room for changes
-            await this.WatchRoom(joinedRoom, watch => {
+            await this.WatchRoom(room, watch => {
                 watch.OnRoomUpdate(OnRoomUpdate);
                 watch.MessageRouter
                     .Forward<AppleThrownMessage>(m => { Debug.Log("Apple thrown!"); })
@@ -33,13 +35,40 @@ namespace Unisave.Matchmaker.Examples.AppleThrowGame
 
         void OnRoomUpdate(CustomRoom newRoom)
         {
-            Debug.Log("New room received!");
+            // remember the new room
+            room = newRoom;
+            
+            Debug.Log("New room received: " + Serializer.ToJsonString(room));
             
             // re-render UI
             
             // watch interesting fields for change
             
             // etc...
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                this.CallFacet((GameFacet f) =>
+                    f.SetMyRoomAppleColor(room.Id, AppleColor.Red)
+                );
+            }
+            
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                this.CallFacet((GameFacet f) =>
+                    f.SetMyRoomAppleColor(room.Id, AppleColor.Yellow)
+                );
+            }
+            
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                this.CallFacet((GameFacet f) =>
+                    f.SetMyRoomAppleColor(room.Id, AppleColor.Green)
+                );
+            }
         }
     }
 }

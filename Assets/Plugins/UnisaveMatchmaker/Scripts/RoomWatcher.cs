@@ -6,9 +6,11 @@ using Unisave.Matchmaker.Backend;
 
 namespace Unisave.Matchmaker
 {
-    public class RoomWatcher<TRoom> : UnisaveBroadcastingClient
+    public class RoomWatcher<TRoom>
         where TRoom : Room
     {
+        private RoomWatcherComponent component;
+        
         public TRoom Room { get; set; }
 
         public MessageRouterBuilder MessageRouter { get; private set; }
@@ -17,8 +19,9 @@ namespace Unisave.Matchmaker
 
         private event Action<TRoom> OnRoomUpdateEvent; 
 
-        public void Prepare(TRoom room)
+        public RoomWatcher(RoomWatcherComponent component, TRoom room)
         {
+            this.component = component;
             Room = room;
             
             router = new MessageRouter();
@@ -29,11 +32,11 @@ namespace Unisave.Matchmaker
         
         public async Task<RoomWatcher<TRoom>> Connect()
         {
-            ChannelSubscription subscription = await this.CallFacet(
+            ChannelSubscription subscription = await component.CallFacet(
                 (MatchmakerFacet f) => f.WatchRoom(Room.Id)
             );
 
-            FromSubscription(subscription)
+            component.PublicFromSubscription(subscription)
                 .Forward<RoomUpdateMessage>(RoomUpdateMessageReceived)
                 .Else(router.RouteMessage);
 

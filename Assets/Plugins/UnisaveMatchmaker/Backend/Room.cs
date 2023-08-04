@@ -123,7 +123,7 @@ namespace Unisave.Matchmaker.Backend
             
             // TODO: if room of different type
 
-            // TODO: wrap it in write-write conflict retry (5x?) with exponential backoff?
+            // TODO: wrap it in write-write conflict retry (3x?) with exponential backoff?
             // something like ethernet does, or try googling.
             // also, try running some benchmarks to *actually* see
             
@@ -131,6 +131,13 @@ namespace Unisave.Matchmaker.Backend
             var room = Room.Find(roomId) as TRoom;
             modification.Invoke(room);
             room.Save();
+            
+            // on success, broadcast room update
+            // TODO: make this a room method "Room.Broadcast(...)" ??? maybe not
+            Broadcast
+                .Channel<RoomChannel>()
+                .OfRoom(roomId)
+                .Send(RoomUpdateMessage.FromRoom(room));
         }
 
         public static void Join(string roomId)

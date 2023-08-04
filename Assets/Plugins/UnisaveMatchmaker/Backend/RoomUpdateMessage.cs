@@ -9,17 +9,17 @@ namespace Unisave.Matchmaker.Backend
     /// </summary>
     public class RoomUpdateMessage : BroadcastingMessage
     {
-        private JsonObject serializedRoom;
+        public Room room;
 
         public TRoom GetRoom<TRoom>() where TRoom : Room
         {
-            return (TRoom) Serializer.FromJson<Room>(serializedRoom);
+            return (TRoom) room;
         }
 
         public static RoomUpdateMessage FromRoom(Room room)
         {
             return new RoomUpdateMessage {
-                serializedRoom = Serializer.ToJson<Room>(room)
+                room = room
             };
         }
     }
